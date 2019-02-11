@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>RDF/JS: Stream interfaces</title>
+  <script src="https://www.w3.org/Tools/respec/respec-w3c-common" class="remove"></script>
+  <script class="remove">
+    var respecConfig = {
+      specStatus: "CG-DRAFT",
+      shortName: "rdfjs-streams",
+      subtitle: "RDF/JS: Stream interfaces",
+      processVersion: 2017,
+      edDraftURI: "https://github.com/rdfjs/stream-spec/",
+      issueBase: "https://github.com/rdfjs/stream-spec/issues/",
+      githubAPI: "https://api.github.com/repos/rdfjs/stream-spec",
+      // TODO: testSuiteURIkey: "",
+      editors: [{
+        name: "Thomas Bergwinkl",
+        url: "https://www.bergnet.org/people/bergi/card#me",
+        company: "Zazuko",
+        companyURL: "http://zazuko.com/"
+      }, {
+        name: "Ruben Verborgh",
+        url: "https://ruben.verborgh.org/",
+        company: "Ghent University – imec",
+        companyURL: "http://idlab.ugent.be/"
+      }],
+      authors:  [{
+        name: "Thomas Bergwinkl",
+        url: "https://www.bergnet.org/people/bergi/card#me",
+        company: "Zazuko",
+        companyURL: "http://zazuko.com/"
+      }, {
+        name: "Michael Luggen",
+        url: "http://oiu.ch",
+        company: "Bern University of Applied Sciences",
+        companyURL: "http://www.bfh.ch"
+      }, {
+        name: "elf Pavlik",
+        url: "https://elf-pavlik.hackers4peace.net/"
+      }, {
+        name: "Blake Regalia",
+        company: "STKO Lab @ UCSB",
+        companyURL: "http://stko.geog.ucsb.edu/"
+      }, {
+        name: "Piero Savastano",
+        url: "http://pieroit.org",
+        company: "Freelance Data Scientist"
+      }, {
+        name: "Ruben Verborgh",
+        url: "https://ruben.verborgh.org/",
+        company: "Ghent University – imec",
+        companyURL: "http://idlab.ugent.be/"
+      }],
+      bugTracker:             {
+        open: "https://github.com/rdfjs/stream-spec/issues?utf8=%E2%9C%93&q=is%3Aissue%20is%3Aopen%20",
+        new:  "https://github.com/rdfjs/stream-spec/issues/new"
+      },
+      otherLinks: [{
+        key: "Version control",
+        data: [{
+          value: "Github Repository",
+          href: "https://github.com/rdfjs/stream-spec"
+        }]
+      }],
+      wg: "RDF JavaScript Libraries Community Group",
+      wgURI: "https://www.w3.org/community/rdfjs/",
+      wgPublicList: "public-rdfjs",
+      maxTocLevel: 2
+    };
+  </script>
+</head>
+<body>
+  <section id="abstract">
+    <p>
+    </p>
+  </section>
+
+  <section id="sotd">
+    <p>
+      This document provides a specification of a low level interface definition representing RDF data
+      independent of a serialized format in a JavaScript environment. The task force which defines
+      this interface was formed by RDF JavaScript library developers with the wish to make existing
+      and future libraries interoperable. This definition strives to provide the minimal necessary
+      interface to enable interoperability of libraries such as serializers, parsers and higher level
+      accessors and manipulators.
+    </p>
+  </section>
+
+  <section>
+    <h2>Stream interfaces</h2>
+    <p>
+      Streams are used only in a readable manner. This requires only a single queue per stream, which
+      simplifies implementations and doesn't have performance drawbacks, compared to writeable
+      streams.
+    </p>
+
+    <img src="img/stream_diagram.svg" alt="UML data interface diagram" style="width: 100%;">
+
+    <section data-dfn-for="Stream">
+      <h3><dfn>Stream</dfn> interface</h3>
+
+      <pre class="idl">
+      interface Stream : EventEmitter {
+        Quad read();
+        attribute Event readable;
+        attribute Event end;
+        attribute Event error;
+        attribute Event data;
+        attribute Event prefix;
+      };
+      </pre>
+
+      <p>
+        <dfn>read()</dfn> This method pulls a quad out of the internal buffer and returns it. If there
+        is no quad available, then it will return null.
+      </p>
+      <p>
+        <dfn>readable</dfn> When a quad can be read from the stream, it will emit this event.
+      </p>
+      <p>
+        <dfn>end</dfn> This event fires when there will be no more quads to read.
+      </p>
+      <p>
+        <dfn>error</dfn> `error(Error error)` This event fires if any error occurs. The `message` describes the error.
+      </p>
+      <p>
+        <dfn>data</dfn> `data(Quad quad)` This event is emitted for every quad that can be read from the stream. The `quad` is the content of the data.
+      </p>
+      <h4>Optional Events</h4>
+      <p>
+        These events are not required, but if an implementation wishes to support such events, they should conform to these definitions:
+      </p>
+      <p>
+        <dfn>prefix</dfn> `prefix(string prefix, NamedNode iri)` This event is emitted every time a prefix is mapped to some IRI.
+      </p>
+    </section>
+
+    <section data-dfn-for="Source">
+      <h3><dfn>Source</dfn> interface</h3>
+
+      <pre class="idl">
+      interface Source {
+        Stream match(optional Term? subject, optional Term? predicate, optional Term? object, optional Term? graph);
+      };
+      </pre>
+
+      <p>
+        A Source is an object that emits quads. It can contain quads but also generate them on the
+        fly. For example, parsers and transformations which generate quads can implement the Source
+        interface.
+      </p>
+      <p>
+        <dfn>match()</dfn> Returns a stream that processes all quads matching the pattern.
+      </p>
+      <p class="note">
+        When matching with <code>graph</code> set to <code>undefined</code> or <code>null</code>
+        it MUST match all the graphs (sometimes called <em>the union graph</em>). To match only <em>the default graph</em>
+        set <code>graph</code> to a <code>DefaultGraph</code>
+      </p>
+    </section>
+
+    <section data-dfn-for="Sink">
+      <h3><dfn>Sink</dfn> interface</h3>
+
+      <pre class="idl">
+      interface Sink {
+        EventEmitter import(Stream stream);
+      };
+      </pre>
+
+      <p>
+        A Sink is an object that consumes data from different kinds of streams. It can store the
+        content of the stream or do some further processing. For example parsers, serializers,
+        transformations and stores can implement the Sink interface.
+      </p>
+      <p>
+        <dfn>import()</dfn> Consumes the given stream. The <code>end</code> and <code>error</code>
+        events are used like described in the <code>Stream</code> interface. Depending on the use
+        case, subtypes of <code>EventEmitter</code> or <code>Stream</code> are used.
+      </p>
+      <h4>Typical use cases</h4>
+      <ul>
+        <li><strong>Parser:</strong><pre>Stream&lt;Quad&gt; import(Stream stream)</pre></li>
+        <li><strong>Serializer</strong><pre>Stream import(Stream&lt;Quad&gt; stream)</pre></li>
+        <li><strong>Transformation</strong><pre>Stream&lt;Quad&gt; import(Stream&lt;Quad&gt; stream)</pre></li>
+        <li><strong>Store</strong><pre>EventEmitter .import(Stream&lt;Quad&gt; stream)</pre></li>
+      </ul>
+    </section>
+
+    <section data-dfn-for="Store">
+      <h3><dfn>Store</dfn> interface</h3>
+
+      <pre class="idl">
+      interface Store {
+        EventEmitter remove(Stream stream);
+        EventEmitter removeMatches(optional Term? subject, optional Term? predicate, optional Term? object, optional Term? graph);
+        EventEmitter deleteGraph((Term or string) graph);
+      };
+
+      Store implements Source;
+      Store implements Sink;
+      </pre>
+
+      <p>
+        A Store is an object that usually used to persist quads. The interface allows removing quads,
+        beside read and write access. The quads can be stored locally or remotely. Access to stores
+        LDP or SPARQL endpoints can be implemented with a Store inteface.
+      </p>
+      <p>
+        <dfn>remove()</dfn> Removes all streamed quads. The <code>end</code> and <code>error</code>
+        events are used like described in the <code>Stream</code> interface.
+      </p>
+      <p>
+        <dfn>removeMatches()</dfn> All quads matching the pattern will be removed. The
+        <code>end</code> and <code>error</code> events are used like described in the
+        <code>Stream</code> interface.
+      </p>
+      <p>
+        <dfn>deleteGraph()</dfn> Deletes the given named graph. The <code>end</code> and
+        <code>error</code> events are used like described in the <code>Stream</code> interface.
+      </p>
+    </section>
+  </section>
+</body>
+</html>
