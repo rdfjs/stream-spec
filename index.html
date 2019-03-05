@@ -140,6 +140,12 @@
       <h3><dfn>Source</dfn> interface</h3>
 
       <pre class="idl">
+      interface SourceOptions {
+        attribute DataFactory? factory;
+      };
+
+      [Constructor,
+       Constructor(Source options)]
       interface Source {
         Stream match(optional Term? subject, optional Term? predicate, optional Term? object, optional Term? graph);
       };
@@ -158,12 +164,27 @@
         it MUST match all the graphs (sometimes called <em>the union graph</em>). To match only <em>the default graph</em>
         set <code>graph</code> to a <code>DefaultGraph</code>
       </p>
+      <p>
+        <dfn>SourceOptions</dfn> Source constructor can take <code>options</code> object as parameter.
+      </p>
+      <div data-dfn-for="SourceOptions">
+        <p>
+          <dfn>factory</dfn> DataFactory that Source will use.
+        </p>
+      </div>
     </section>
 
     <section data-dfn-for="Sink">
       <h3><dfn>Sink</dfn> interface</h3>
 
       <pre class="idl">
+      interface SinkOptions {
+        attribute string? baseIRI;
+        attribute DataFactory? factory;
+      };
+
+      [Constructor,
+       Constructor(SinkOptions options)]
       interface Sink {
         EventEmitter import(Stream stream);
       };
@@ -179,6 +200,17 @@
         events are used like described in the <code>Stream</code> interface. Depending on the use
         case, subtypes of <code>EventEmitter</code> or <code>Stream</code> are used.
       </p>
+      <p>
+        <dfn>SinkOptions</dfn> Sink constructor can take <code>options</code> object as parameter.
+      </p>
+      <div data-dfn-for="SinkOptions">
+        <p>
+          <dfn>baseIRI</dfn> Base IRI used to resolve or create relative IRIs.
+        </p>
+        <p>
+          <dfn>factory</dfn> DataFactory that Sink will use if <code>import()</code> returns <code>Stream&lt;Quad&gt;</code>.
+        </p>
+      </div>
       <h4>Typical use cases</h4>
       <ul>
         <li><strong>Parser:</strong><pre>Stream&lt;Quad&gt; import(Stream stream)</pre></li>
@@ -192,6 +224,12 @@
       <h3><dfn>Store</dfn> interface</h3>
 
       <pre class="idl">
+      interface StoreOptions {
+        attribute DataFactory? factory;
+      };
+
+      [Constructor,
+       Constructor(StoreOptions options)]
       interface Store {
         EventEmitter remove(Stream stream);
         EventEmitter removeMatches(optional Term? subject, optional Term? predicate, optional Term? object, optional Term? graph);
@@ -220,6 +258,14 @@
         <dfn>deleteGraph()</dfn> Deletes the given named graph. The <code>end</code> and
         <code>error</code> events are used like described in the <code>Stream</code> interface.
       </p>
+      <p>
+        <dfn>StoreOptions</dfn> Store constructor can take <code>options</code> object as parameter.
+      </p>
+      <div data-dfn-for="StoreOptions">
+        <p>
+          <dfn>factory</dfn> DataFactory that Store will use.
+        </p>
+      </div>
     </section>
   </section>
 </body>
