@@ -141,7 +141,7 @@
 
       <pre class="idl">
       interface SourceOptions {
-        attribute DataFactory? factory;
+        attribute DataFactory? dataFactory;
       };
 
       [Constructor,
@@ -169,7 +169,7 @@
       </p>
       <div data-dfn-for="SourceOptions">
         <p>
-          <dfn>factory</dfn> DataFactory that Source will use.
+          <dfn>dataFactory</dfn> DataFactory that Source will use.
         </p>
       </div>
     </section>
@@ -180,7 +180,7 @@
       <pre class="idl">
       interface SinkOptions {
         attribute string? baseIRI;
-        attribute DataFactory? factory;
+        attribute DataFactory? dataFactory;
       };
 
       [Constructor,
@@ -208,7 +208,7 @@
           <dfn>baseIRI</dfn> Base IRI used to resolve or create relative IRIs.
         </p>
         <p>
-          <dfn>factory</dfn> DataFactory that Sink will use if <code>import()</code> returns <code>Stream&lt;Quad&gt;</code>.
+          <dfn>dataFactory</dfn> DataFactory that Sink will use if <code>import()</code> returns <code>Stream&lt;Quad&gt;</code>.
         </p>
       </div>
       <h4>Typical use cases</h4>
@@ -225,7 +225,7 @@
 
       <pre class="idl">
       interface StoreOptions {
-        attribute DataFactory? factory;
+        attribute DataFactory? dataFactory;
       };
 
       [Constructor,
@@ -263,7 +263,7 @@
       </p>
       <div data-dfn-for="StoreOptions">
         <p>
-          <dfn>factory</dfn> DataFactory that Store will use.
+          <dfn>dataFactory</dfn> DataFactory that Store will use.
         </p>
       </div>
     </section>
