@@ -135,17 +135,31 @@
         <dfn>prefix</dfn> `prefix(string prefix, NamedNode iri)` This event is emitted every time a prefix is mapped to some IRI.
       </p>
     </section>
+    <section data-dfn-for="ConstructorOptions">
+      <h3><dfn>ConstructorOptions</dfn> interface</h3>
+      <pre class="idl">
+      interface ConstructorOptions {
+        attribute DataFactory? dataFactory;
+        attribute string? baseIRI;
+      };
+      </pre>
+      <p>
+        Constructors of all other interfaces defined in this spec accept options parameter. While we define this parameter as optional as well as all its attributes as optional, specific implementations may choose to require them. All implementations SHOULD provide documentation of the constructors and their options.
+      </p>
+      <p>
+        <dfn>dataFactory</dfn> DataFactory implementation that created instance implementing the interface will use to create all the Data Model instances.
+      </p>
+      <p>
+        <dfn>baseIRI</dfn> Base IRI that created instance implementing the interface will use to resolve or create relative IRIs.
+      </p>
+    </section>
 
     <section data-dfn-for="Source">
       <h3><dfn>Source</dfn> interface</h3>
 
       <pre class="idl">
-      interface SourceOptions {
-        attribute DataFactory? dataFactory;
-      };
-
       [Constructor,
-       Constructor(Source options)]
+       Constructor(ConstructorOptions options)]
       interface Source {
         Stream match(optional Term? subject, optional Term? predicate, optional Term? object, optional Term? graph);
       };
@@ -164,32 +178,18 @@
         it MUST match all the graphs (sometimes called <em>the union graph</em>). To match only <em>the default graph</em>
         set <code>graph</code> to a <code>DefaultGraph</code>
       </p>
-      <p>
-        <dfn>SourceOptions</dfn> Source constructor can take <code>options</code> object as parameter.
-      </p>
-      <div data-dfn-for="SourceOptions">
-        <p>
-          <dfn>dataFactory</dfn> DataFactory that Source will use.
-        </p>
-      </div>
     </section>
 
     <section data-dfn-for="Sink">
       <h3><dfn>Sink</dfn> interface</h3>
 
       <pre class="idl">
-      interface SinkOptions {
-        attribute string? baseIRI;
-        attribute DataFactory? dataFactory;
-      };
-
       [Constructor,
-       Constructor(SinkOptions options)]
+       Constructor(ConstructorOptions options)]
       interface Sink {
         EventEmitter import(Stream stream);
       };
       </pre>
-
       <p>
         A Sink is an object that consumes data from different kinds of streams. It can store the
         content of the stream or do some further processing. For example parsers, serializers,
@@ -200,17 +200,6 @@
         events are used like described in the <code>Stream</code> interface. Depending on the use
         case, subtypes of <code>EventEmitter</code> or <code>Stream</code> are used.
       </p>
-      <p>
-        <dfn>SinkOptions</dfn> Sink constructor can take <code>options</code> object as parameter.
-      </p>
-      <div data-dfn-for="SinkOptions">
-        <p>
-          <dfn>baseIRI</dfn> Base IRI used to resolve or create relative IRIs.
-        </p>
-        <p>
-          <dfn>dataFactory</dfn> DataFactory that Sink will use if <code>import()</code> returns <code>Stream&lt;Quad&gt;</code>.
-        </p>
-      </div>
       <h4>Typical use cases</h4>
       <ul>
         <li><strong>Parser:</strong><pre>Stream&lt;Quad&gt; import(Stream stream)</pre></li>
@@ -224,12 +213,8 @@
       <h3><dfn>Store</dfn> interface</h3>
 
       <pre class="idl">
-      interface StoreOptions {
-        attribute DataFactory? dataFactory;
-      };
-
       [Constructor,
-       Constructor(StoreOptions options)]
+       Constructor(ConstructorOptions options)]
       interface Store {
         EventEmitter remove(Stream stream);
         EventEmitter removeMatches(optional Term? subject, optional Term? predicate, optional Term? object, optional Term? graph);
@@ -258,14 +243,6 @@
         <dfn>deleteGraph()</dfn> Deletes the given named graph. The <code>end</code> and
         <code>error</code> events are used like described in the <code>Stream</code> interface.
       </p>
-      <p>
-        <dfn>StoreOptions</dfn> Store constructor can take <code>options</code> object as parameter.
-      </p>
-      <div data-dfn-for="StoreOptions">
-        <p>
-          <dfn>dataFactory</dfn> DataFactory that Store will use.
-        </p>
-      </div>
     </section>
   </section>
 </body>
