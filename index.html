@@ -135,11 +135,31 @@
         <dfn>prefix</dfn> `prefix(string prefix, NamedNode iri)` This event is emitted every time a prefix is mapped to some IRI.
       </p>
     </section>
+    <section data-dfn-for="ConstructorOptions">
+      <h3><dfn>ConstructorOptions</dfn> interface</h3>
+      <pre class="idl">
+      interface ConstructorOptions {
+        attribute DataFactory? dataFactory;
+        attribute string? baseIRI;
+      };
+      </pre>
+      <p>
+        Constructors of all other interfaces defined in this spec accept options parameter. While we define this parameter as optional as well as all its attributes as optional, specific implementations may choose to require them. All implementations SHOULD provide documentation of the constructors and their options.
+      </p>
+      <p>
+        <dfn>dataFactory</dfn> DataFactory implementation that created instance implementing the interface will use to create all the Data Model instances.
+      </p>
+      <p>
+        <dfn>baseIRI</dfn> Base IRI that created instance implementing the interface will use to resolve or create relative IRIs.
+      </p>
+    </section>
 
     <section data-dfn-for="Source">
       <h3><dfn>Source</dfn> interface</h3>
 
       <pre class="idl">
+      [Constructor,
+       Constructor(ConstructorOptions options)]
       interface Source {
         Stream match(optional Term? subject, optional Term? predicate, optional Term? object, optional Term? graph);
       };
@@ -164,11 +184,12 @@
       <h3><dfn>Sink</dfn> interface</h3>
 
       <pre class="idl">
+      [Constructor,
+       Constructor(ConstructorOptions options)]
       interface Sink {
         EventEmitter import(Stream stream);
       };
       </pre>
-
       <p>
         A Sink is an object that consumes data from different kinds of streams. It can store the
         content of the stream or do some further processing. For example parsers, serializers,
@@ -192,6 +213,8 @@
       <h3><dfn>Store</dfn> interface</h3>
 
       <pre class="idl">
+      [Constructor,
+       Constructor(ConstructorOptions options)]
       interface Store {
         EventEmitter remove(Stream stream);
         EventEmitter removeMatches(optional Term? subject, optional Term? predicate, optional Term? object, optional Term? graph);
