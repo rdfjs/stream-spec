@@ -112,9 +112,20 @@
       </pre>
 
       <p>
-        <dfn>read()</dfn> This method pulls a chunk of data out of the internal buffer and returns it. If there
-        is no chunk available, then it will return null.
+        A Stream handles a sequence of data as chunks which are emitted or manually pulled over time.
+        The type of the chunks must be consistent.
         Typical types are Buffer or String for serialized data or Quad for RDF data.
+      </p>
+
+      <p>
+        This specification uses the following notation, for a known type <code>T</code> of a Stream:
+        <pre>Stream&lt;T&gt;</pre>
+      </p>
+
+      <p>
+        <dfn>read()</dfn>
+        This method pulls a chunk of data out of the internal buffer and returns it.
+        If there is no chunk available, then it will return null.
       </p>
       <p>
         <dfn>readable</dfn> When a chunk can be read from the stream, it will emit this event.
