@@ -102,7 +102,7 @@
 
       <pre class="idl">
       interface Stream : EventEmitter {
-        Quad read();
+        any read();
         attribute Event readable;
         attribute Event end;
         attribute Event error;
@@ -112,20 +112,32 @@
       </pre>
 
       <p>
-        <dfn>read()</dfn> This method pulls a quad out of the internal buffer and returns it. If there
-        is no quad available, then it will return null.
+        A Stream handles a sequence of data as chunks which are emitted or manually pulled over time.
+        The type of the chunks must be consistent.
+        Typical types are Buffer or String for serialized data or Quad for RDF data.
+      </p>
+
+      <p>
+        This specification uses the following notation, for a known type <code>T</code> of a Stream:
+        <pre>Stream&lt;T&gt;</pre>
+      </p>
+
+      <p>
+        <dfn>read()</dfn>
+        This method pulls a chunk of data out of the internal buffer and returns it.
+        If there is no chunk available, then it will return null.
       </p>
       <p>
-        <dfn>readable</dfn> When a quad can be read from the stream, it will emit this event.
+        <dfn>readable</dfn> When a chunk can be read from the stream, it will emit this event.
       </p>
       <p>
-        <dfn>end</dfn> This event fires when there will be no more quads to read.
+        <dfn>end</dfn> This event fires when there will be no more chunks to read.
       </p>
       <p>
         <dfn>error</dfn> `error(Error error)` This event fires if any error occurs. The `message` describes the error.
       </p>
       <p>
-        <dfn>data</dfn> `data(Quad quad)` This event is emitted for every quad that can be read from the stream. The `quad` is the content of the data.
+        <dfn>data</dfn> `data(any chunk)` This event is emitted for every chunk that can be read from the stream. The `chunk` is the content of the data.
       </p>
       <h4>Optional Events</h4>
       <p>
@@ -161,7 +173,7 @@
       [Constructor,
        Constructor(ConstructorOptions options)]
       interface Source {
-        Stream match(optional Term? subject, optional Term? predicate, optional Term? object, optional Term? graph);
+        Stream&lt;Quad&gt; match(optional Term? subject, optional Term? predicate, optional Term? object, optional Term? graph);
       };
       </pre>
 
@@ -216,7 +228,7 @@
       [Constructor,
        Constructor(ConstructorOptions options)]
       interface Store {
-        EventEmitter remove(Stream stream);
+        EventEmitter remove(Stream&lt;Quad&gt; stream);
         EventEmitter removeMatches(optional Term? subject, optional Term? predicate, optional Term? object, optional Term? graph);
         EventEmitter deleteGraph((Term or string) graph);
       };
