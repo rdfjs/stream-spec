@@ -192,6 +192,64 @@
       </p>
     </section>
 
+    <section data-dfn-for="Range">
+      <h3><dfn>Range</dfn> interface</h3>
+      <pre class="idl">
+      interface Range {
+        attribute gt? Term;
+        attribute gte? Term;
+        attribute lt? Term;
+        attribute lte? Term;
+      };
+      </pre>
+      <p>
+        A Range is an object that defines a gamut of values by declaring the
+        gamut's own inclusive or exclusive boundaries.
+      </p>
+    </section>
+
+    <section data-dfn-for="RangeSource">
+      <h3><dfn>RangeSource</dfn> interface</h3>
+      <pre class="idl">
+      [Constructor,
+       Constructor(ConstructorOptions options)]
+      interface RangeSource {
+        Stream&lt;Quad&gt; match(
+          optional Term|Range[]|Range? subject,
+          optional Term|Range[]|Range? predicate,
+          optional Term|Range[]|Range? object,
+          optional Term|Range[]|Range? graph
+        );
+        Boolean test(Term term, Range range);
+      };
+      </pre>
+      <p>
+        A RangeSource is a {{Source}} with added support for range-based
+        matching of quad Term(s).
+      </p>
+      <p>
+        <dfn>match()</dfn> Returns a stream that processes all quads matching
+        the pattern, the latter defined using a mix of Term(s) and {{Range}}(s).
+        <dfn>test()</dfn> Returns `true` when the provided Term falls within
+        the specified {{Range}}.
+      </p>
+      <p class="note">
+        When matching using {{Range}} object, instances <em>may</em> elect to
+        test whether a given Term falls within a specified {{Range}} based on
+        the logical values of the Term and the {{Range}} boundaries as opposed
+        to their literal values. A numerical Term, such as a literal Term
+        having the `xsd:integer` datatype, might be tested against similarly
+        defined {{Range}} boundaries based on their position on the spectrum of
+        real numbers rather than based on the lexicographical ordering of their
+        literal forms. Instances <em>may</em> allows this behaviour to be
+        enabled/disabled via an appropriate option passed to their constructors.
+      </p>
+      <p class="note">
+        The presence of the `test()` method <em>may</em> be used to evaluate
+        whether a {{Source}} instance is also a {{RangeSource}}.
+      </p>
+    </section>
+
     <section data-dfn-for="Sink">
       <h3><dfn>Sink</dfn> interface</h3>
 
