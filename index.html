@@ -94,6 +94,10 @@
       simplifies implementations and doesn't have performance drawbacks, compared to writeable
       streams.
     </p>
+    
+    <p>
+      The interfaces introduces in this spec make use of the <dfn>Term</dfn> and <dfn>DataFactory</dfn> interfaces from the <a href="https://rdf.js.org/data-model-spec/">RDF/JS Data model specification</a>
+    </p>
 
     <img src="img/stream_diagram.svg" alt="UML data interface diagram" style="width: 100%;">
 
@@ -101,6 +105,7 @@
       <h3><dfn>Stream</dfn> interface</h3>
 
       <pre class="idl">
+      [Exposed=(Window,Worker)]
       interface Stream : EventEmitter {
         any read();
         attribute Event readable;
@@ -116,6 +121,8 @@
         The type of the chunks must be consistent.
         Typical types are Buffer or String for serialized data or Quad for RDF data.
       </p>
+      
+      <p>The <dfn>EventEmitter</dfn> and <dfn>Event</dfn> types originate from <a href="https://nodejs.org/docs/latest-v17.x/api/">Node.JS</a></p>
 
       <p>
         This specification uses the following notation, for a known type <code>T</code> of a Stream:
@@ -150,9 +157,10 @@
     <section data-dfn-for="ConstructorOptions">
       <h3><dfn>ConstructorOptions</dfn> interface</h3>
       <pre class="idl">
+      [Exposed=(Window,Worker)]
       interface ConstructorOptions {
         attribute DataFactory? dataFactory;
-        attribute string? baseIRI;
+        attribute DOMString? baseIRI;
       };
       </pre>
       <p>
@@ -170,10 +178,11 @@
       <h3><dfn>Source</dfn> interface</h3>
 
       <pre class="idl">
-      [Constructor,
-       Constructor(ConstructorOptions options)]
+      [Exposed=(Window,Worker)]
       interface Source {
-        Stream&lt;Quad&gt; match(optional Term? subject, optional Term? predicate, optional Term? object, optional Term? graph);
+        constructor();
+        constructor(ConstructorOptions options);
+        Stream match(optional Term? subject, optional Term? predicate, optional Term? _object, optional Term? graph);
       };
       </pre>
 
@@ -183,7 +192,7 @@
         interface.
       </p>
       <p>
-        <dfn>match()</dfn> Returns a stream that processes all quads matching the pattern.
+        <dfn>match()</dfn> Returns a stream of <code>Quad</code>s that processes all quads matching the pattern.
       </p>
       <p class="note">
         When matching with <code>graph</code> set to <code>undefined</code> or <code>null</code>
@@ -196,9 +205,10 @@
       <h3><dfn>Sink</dfn> interface</h3>
 
       <pre class="idl">
-      [Constructor,
-       Constructor(ConstructorOptions options)]
+      [Exposed=(Window,Worker)]
       interface Sink {
+        constructor();
+        constructor(ConstructorOptions options);
         EventEmitter import(Stream stream);
       };
       </pre>
@@ -225,16 +235,14 @@
       <h3><dfn>Store</dfn> interface</h3>
 
       <pre class="idl">
-      [Constructor,
-       Constructor(ConstructorOptions options)]
-      interface Store {
-        EventEmitter remove(Stream&lt;Quad&gt; stream);
-        EventEmitter removeMatches(optional Term? subject, optional Term? predicate, optional Term? object, optional Term? graph);
-        EventEmitter deleteGraph((Term or string) graph);
+      [Exposed=(Window,Worker)]
+      interface Store { // Extends Source and Sink
+        constructor();
+        constructor(ConstructorOptions options);
+        EventEmitter remove(Stream stream);
+        EventEmitter removeMatches(optional Term? subject, optional Term? predicate, optional Term? _object, optional Term? graph);
+        EventEmitter deleteGraph((Term or DOMString) graph);
       };
-
-      Store implements Source;
-      Store implements Sink;
       </pre>
 
       <p>
@@ -243,7 +251,7 @@
         LDP or SPARQL endpoints can be implemented with a Store inteface.
       </p>
       <p>
-        <dfn>remove()</dfn> Removes all streamed quads. The <code>end</code> and <code>error</code>
+        <dfn>remove()</dfn> Removes all streamed <code>Quad</code>s. The <code>end</code> and <code>error</code>
         events are used like described in the <code>Stream</code> interface.
       </p>
       <p>
